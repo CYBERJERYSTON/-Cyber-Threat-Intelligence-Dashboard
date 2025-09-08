@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CTI Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Cyber Threat Intelligence Dashboard</h1>
+
+  <form method="POST" action="/lookup">
+    <input type="text" name="ip" placeholder="Enter IP to check">
+    <button type="submit">Lookup</button>
+  </form>
+
+  <h2>Recent Threats</h2>
+  <ul>
+    {% for threat in threats %}
+      <li>{{ threat["ioc"] }} - {{ threat["source"] }} - {{ threat["timestamp"] }}</li>
+    {% endfor %}
+  </ul>
+
+  <canvas id="threatChart"></canvas>
+  <script>
+    var ctx = document.getElementById('threatChart').getContext('2d');
+    var chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [{% for threat in threats %}"{{ threat['ioc'] }}",{% endfor %}],
+        datasets: [{
+          label: 'Threat Score',
+          data: [{% for threat in threats %}{{ threat.get('abuseipdb_score', 0) }},{% endfor %}]
+        }]
+      }
+    });
+  </script>
+</body>
+</html>
